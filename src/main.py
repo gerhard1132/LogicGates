@@ -10,7 +10,7 @@ from components.utils import _check_mouse_state
 # Create screen
 pg.init()
 screen = pg.display.set_mode((900, 500))
-pg.display.set_caption("pg Layout Example")
+pg.display.set_caption("LogicGates")
 
 # All inits
 menu = Menu(screen, 200)
