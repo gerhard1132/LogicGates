@@ -5,7 +5,8 @@ from .nodes import IoNode
 
 
 class Box:
-    def __init__(self, width=160, height=80, pos=(0,0), text="Hi", c="white", line_width= 1):
+    def __init__(self, screen=None, width=160, height=80, pos=(0,0), text="Hi", c="white", line_width= 1):
+        self.screen = screen
         self.width = width
         self.height = height
         self.position = pos
@@ -15,11 +16,11 @@ class Box:
         self.dragging = False
 
         
-    def _draw(self, screen: pg.Surface):
-        pg.draw.line(screen, self.color, (self.position[0], self.position[1]), (self.position[0]+self.width, self.position[1]), width=self.line_width) # Top line
-        pg.draw.line(screen, self.color, (self.position[0], self.position[1]+self.height), (self.position[0]+self.width, self.position[1]+self.height), width=self.line_width) # bottom line
-        pg.draw.line(screen, self.color, (self.position[0], self.position[1]), (self.position[0], self.position[1]+self.height), width=self.line_width) # Left line
-        pg.draw.line(screen, self.color, (self.position[0]+self.width, self.position[1]), (self.position[0]+self.width, self.position[1]+self.height), width=self.line_width) # Left line
+    def _draw(self):
+        pg.draw.line(self.screen, self.color, (self.position[0], self.position[1]), (self.position[0]+self.width, self.position[1]), width=self.line_width) # Top line
+        pg.draw.line(self.screen, self.color, (self.position[0], self.position[1]+self.height), (self.position[0]+self.width, self.position[1]+self.height), width=self.line_width) # bottom line
+        pg.draw.line(self.screen, self.color, (self.position[0], self.position[1]), (self.position[0], self.position[1]+self.height), width=self.line_width) # Left line
+        pg.draw.line(self.screen, self.color, (self.position[0]+self.width, self.position[1]), (self.position[0]+self.width, self.position[1]+self.height), width=self.line_width) # Left line
         
         # Text
         font = pg.font.SysFont(None, 24)
@@ -28,7 +29,7 @@ class Box:
             self.position[0] + self.width / 2,
             self.position[1] + self.height/ 2
         ))
-        screen.blit(text_surf, text_rect)
+        self.screen.blit(text_surf, text_rect)
         
 
     def _is_hovered(self, mouse_pos):
@@ -47,18 +48,34 @@ class Box:
 
 
 class AND_GATE(Box):
-    def __init__(self, width=160, height=80, pos=(0, 0), text="AND", c="white", line_width=1):
-        super().__init__(width, height, pos, text, c, line_width)
-        self.inputs = [
-            IoNode(pos=(self.position[0],self.position[1]-self.height * .3)),
-            IoNode(pos=(self.position[0],self.position[1]-self.height * .6))
+    def __init__(self, screen=..., width=160, height=80, pos=None, text="AND", c="white", line_width=1):
+        super().__init__(screen, width, height, pos, text, c, line_width)
+        self.position = pos if pos else (screen.get_width()/2, screen.get_height()/2)
+        self.nodes = [
+            IoNode(self.screen, offset=(0, self.height*.3)),
+            IoNode(self.screen, offset=(0, self.height*.6)),
+            IoNode(self.screen, offset=(self.width, self.height/2))
             ]
         self.output = False
         
-    def _draw(self, screen):
-        for input_node in self.inputs:
-            input_node._draw(screen)
-        super()._draw(screen)
-    
-    def _is_hovered(self, mouse_pos):
-        return super()._is_hovered(mouse_pos)
+    def _draw(self):
+        super()._draw()
+        for input_node in self.nodes:
+            input_node._draw(to_pos=(self.position))
+
+
+class OR_GATE(Box):
+    def __init__(self, screen=..., width=160, height=80, pos=None, text="OR", c="white", line_width=1):
+        super().__init__(screen, width, height, pos, text, c, line_width)
+        self.position = pos if pos else (screen.get_width()/2, screen.get_height()/2)
+        self.nodes = [
+            IoNode(self.screen, offset=(0, self.height*.3)),
+            IoNode(self.screen, offset=(0, self.height*.6)),
+            IoNode(self.screen, offset=(self.width, self.height/2))
+            ]
+        self.output = False
+        
+    def _draw(self):
+        super()._draw()
+        for input_node in self.nodes:
+            input_node._draw(to_pos=(self.position))
