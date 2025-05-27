@@ -2,14 +2,16 @@
 import pygame as pg
 
 from .nodes import IoNode
+from .layers import UsageLayer
 
 
-class Box:
-    def __init__(self, screen=None, width=160, height=80, pos=(0,0), text="Hi", c="white", line_width= 1):
+class Box(UsageLayer):
+    def __init__(self, screen, width=160, height=80, pos=None, text="Hi", c="white", line_width= 1):
+        super().__init__(screen)
         self.screen = screen
         self.width = width
         self.height = height
-        self.position = pos
+        self.position = pos if pos else (screen.get_width()/2, screen.get_height()/2)
         self.text = text
         self.color = c
         self.line_width = line_width
@@ -32,13 +34,13 @@ class Box:
         self.screen.blit(text_surf, text_rect)
         
 
-    def _is_hovered(self, mouse_pos):
+    def is_hovered(self, mouse_pos):
         x, y = self.position
         return x <= mouse_pos[0] <= x + self.width and y <= mouse_pos[1] <= y + self.height
     
     def _handle_event(self, event):
         if event.type == pg.MOUSEBUTTONDOWN:
-            if self._is_hovered(event.pos):
+            if self.is_hovered(event.pos):
                 self.dragging = True
                 self.offset = (self.position[0] - event.pos[0], self.position[1] - event.pos[1])
         elif event.type == pg.MOUSEBUTTONUP:
@@ -48,7 +50,7 @@ class Box:
 
 
 class AND_GATE(Box):
-    def __init__(self, screen=..., width=160, height=80, pos=None, text="AND", c="white", line_width=1):
+    def __init__(self, screen, width=160, height=80, pos=None, text="AND-Gate", c="white", line_width=1):
         super().__init__(screen, width, height, pos, text, c, line_width)
         self.position = pos if pos else (screen.get_width()/2, screen.get_height()/2)
         self.nodes = [
@@ -65,7 +67,7 @@ class AND_GATE(Box):
 
 
 class OR_GATE(Box):
-    def __init__(self, screen=..., width=160, height=80, pos=None, text="OR", c="white", line_width=1):
+    def __init__(self, screen, width=160, height=80, pos=None, text="OR-GATE", c="white", line_width=1):
         super().__init__(screen, width, height, pos, text, c, line_width)
         self.position = pos if pos else (screen.get_width()/2, screen.get_height()/2)
         self.nodes = [
